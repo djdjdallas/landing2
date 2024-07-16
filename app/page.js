@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -179,6 +181,28 @@ function XIcon(props) {
 }
 
 export default function Page() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      setMessage(data.message);
+    } catch (error) {
+      setMessage("Error sending email");
+    }
+  };
+
   return (
     <>
       <header className="p-4 flex justify-end max-w-7xl mx-auto"></header>
@@ -192,14 +216,20 @@ export default function Page() {
               Streamline your customer communication and boost engagement with
               our powerful email marketing solution.
             </p>
-            <form className="w-full max-w-md flex gap-2">
+            <form
+              className="w-full max-w-md flex gap-2"
+              onSubmit={handleSubmit}
+            >
               <Input
                 type="email"
                 placeholder="Enter your email"
                 className="flex-1"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <Button type="submit">Notify Me</Button>
             </form>
+            {message && <p>{message}</p>}
           </div>
         </section>
         <section className="bg-muted py-12 md:py-24 lg:py-32">
